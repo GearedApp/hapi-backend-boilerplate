@@ -27,8 +27,8 @@ exports.comparePassword = async (plainPassword, hashPassword, callback) => {
  */
 exports.hashPassword = async (plainPassword, callback) => {
   try {
-    let salt = Bcrypt.genSalt(process.env.HASH_ROUNDS);
-    let hash = Bcrypt.hash(plainPassword, salt);
+    let salt = await Bcrypt.genSalt(10);
+    let hash = await Bcrypt.hash(plainPassword, salt);
 
     callback(null, hash);
   } catch (err) {

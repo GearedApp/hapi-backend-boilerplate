@@ -1,9 +1,10 @@
 'use strict';
 
-const Mongoose, { Schema } = require('mongoose');
+const Mongoose = require('mongoose');
 const { comparePassword, hashPassword } = require('../utils/passwords');
+const { generateAuthToken, generatePasswordToken } = require('../utils/tokens');
 
-let TokenSchema = new Schema({
+let TokenSchema = new Mongoose.Schema({
   access: {
     type: String,
     required: false,
@@ -16,7 +17,7 @@ let TokenSchema = new Schema({
   }
 });
 
-let UserSchema = new Schema({
+let UserSchema = new Mongoose.Schema({
   email: {
     type: String,
     required: 'Email Address is required',
@@ -62,6 +63,50 @@ let UserSchema = new Schema({
   },
 });
 
+UserSchema.statics.findByCredentials = async (decodedToken) => {
+  try {
+    let user = await this.findById(decodedToken.id);
+
+    return user;
+  } catch (err) {
+    return err;
+  }
+};
+
+UserSchema.methods.generateAuthToken = async () => {
+  let user = this;
+
+  try {
+    let token = await generateAuthToken({ id: user._id });
+
+    return token;
+  } catch (err) {
+    return err;
+  }
+};
+
+UserSchema.methods.generatePasswordToken = async () => {
+  let user = this;
+
+  try {
+    let token = await generatePasswordToken({ id: user._id });
+
+    return token;
+  } catch (err) {
+    return err;
+  }
+};
+
+UserSchema.methods.destroyToken = async (token) => {
+  let user = this;
+
+  try {
+    await user.update({ $pull: { tokens: token } });
+  } catch (err) {
+    return err;
+  }
+};
+
 UserSchema.methods.comparePassword = (plainPassword) => {
   let user = this;
 
@@ -72,7 +117,7 @@ UserSchema.methods.comparePassword = (plainPassword) => {
   });
 };
 
-UserSchema.pre('save', (next) => {
+UserSchema.pre('save', function (next) {
   let user = this;
 
   hashPassword(user.password, (err, hash) => {

@@ -1,6 +1,7 @@
 'use strict';
 
 const Hapi = require('Hapi');
+const { validate } = require('./utils/authentication');
 
 // Requires
 require('dotenv').config();
@@ -10,9 +11,24 @@ require('./database');
 const server = new Hapi.Server();
 server.connection({ host: 'localhost', port: 8000 });
 
-// Start the server
-server.start((err) => {
+// Load plugins and start the server
+server.register([
+  require('hapi-auth-jwt'),
+  require('./routes/auth'),
+], (err) => {
   if (err) throw err;
 
-  console.log(`Server running at: ${server.info.uri}`);
+  server.auth.strategy('token', 'jwt', {
+    key: process.env.SECRET_KEY,
+    validateFunc: validate,
+    verifyOptions: {
+      algorithms:['HS256'],
+    }
+  });
+
+  server.auth.default('token');
+
+  server.start((err) => {
+    console.log('Server running at:', server.info.uri);
+  });
 });
