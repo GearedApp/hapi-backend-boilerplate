@@ -31,10 +31,14 @@
     "bcrypt": "^1.0.3",
     "boom": "^5.2.0",
     "dotenv": "^4.0.0",
+    "email-templates": "^2.7.1",
+    "handlebars": "^4.0.10",
     "hapi": "^16.5.2",
     "hapi-auth-jwt": "^4.0.0",
     "joi": "^10.6.0",
     "jsonwebtoken": "^7.4.3",
-    "mongoose": "^4.11.10"
+    "mongoose": "^4.11.10",
+    "node-sass": "^4.5.3",
+    "nodemailer": "^4.1.0"
   }
 }

@@ -9,7 +9,7 @@ require('./database');
 
 // Create server connection using host and port
 const server = new Hapi.Server();
-server.connection({ host: 'localhost', port: 8000 });
+server.connection({ host: 'localhost', port: process.env.PORT || 8000 });
 
 // Load plugins and start the server
 server.register([

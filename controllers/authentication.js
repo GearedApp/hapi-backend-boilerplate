@@ -4,6 +4,7 @@ const Boom = require('boom');
 const User = require('../models/User');
 const Jwt = require('jsonwebtoken');
 const { generateAuthToken, generatePasswordToken, decodeToken } = require('../utils/tokens');
+const { sendMail } = require('../utils/emails');
 
 /**
  * Create new Account and return auth token
@@ -39,7 +40,7 @@ exports.login = (request, reply) => {
     }
 
     if (!user) {
-      return reply({ code: 400, status: 'error', message: 'User not found' }).code(400);
+      return reply(Boom.notFound('User not found'));
     }
 
     user.comparePassword(data.password, (err, isMatch) => {
@@ -48,7 +49,7 @@ exports.login = (request, reply) => {
       }
 
       if (!isMatch) {
-        return reply({ code: 400, status: 'error', message: 'Email or password is incorrect' }).code(400);
+        return reply(Boom.badRequest('Email or password is incorrect'));
       }
 
       let token = Jwt.sign({ id: user._id }, process.env.SECRET_KEY, { expiresIn: '1d' });
@@ -69,9 +70,9 @@ exports.forgotPassword = async (request, reply) => {
   try {
     let user = await User.findOne({ email });
     let token = await generatePasswordToken({ id: user._id });
-    await user.update({ $set: { passwordToken: token } });
 
-    // TODO: Send email to user with token and link to recover password
+    let url = `${process.env.ROOT_URL}/reset-password`;
+    await sendMail({ email, url }, 'Forgot Password' ,'forgotPassword');
 
     reply({ code: 200, status: 'success', message: 'Email successfully sent' }).code(200);
   } catch (err) {
@@ -91,7 +92,7 @@ exports.recoverPassword = async (request, reply) => {
 
   try {
     let decoded = await decodeToken(token);
-    let user = await User.findOne({ _id: decoded.id, passwordToken: token });
+    let user = await User.findOne({ _id: decoded.id });
 
     user.password = password;
     user.passwordToken = undefined;

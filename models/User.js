@@ -27,12 +27,6 @@ let UserSchema = new Mongoose.Schema({
     default: false,
   },
 
-  passwordToken: {
-    type: String,
-    select: false,
-    required: false,
-  },
-
   created_at: {
     type: Date,
     required: true,

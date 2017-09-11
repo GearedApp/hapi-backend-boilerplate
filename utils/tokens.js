@@ -28,7 +28,7 @@ exports.generatePasswordToken = async (payload) => {
   try {
     const token = await Jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '1h' });
 
-    return { access, token };
+    return token;
   } catch (err) {
     return err;
   }
