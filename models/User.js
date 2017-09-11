@@ -4,19 +4,6 @@ const Mongoose = require('mongoose');
 const { comparePassword, hashPassword } = require('../utils/passwords');
 const { generateAuthToken, generatePasswordToken } = require('../utils/tokens');
 
-let TokenSchema = new Mongoose.Schema({
-  access: {
-    type: String,
-    required: false,
-    enum: ['auth', 'password'],
-  },
-
-  token: {
-    type: String,
-    required: false
-  }
-});
-
 let UserSchema = new Mongoose.Schema({
   email: {
     type: String,
@@ -40,8 +27,8 @@ let UserSchema = new Mongoose.Schema({
     default: false,
   },
 
-  tokens: {
-    type: [TokenSchema],
+  passwordToken: {
+    type: String,
     select: false,
     required: false,
   },
@@ -97,28 +84,20 @@ UserSchema.methods.generatePasswordToken = async () => {
   }
 };
 
-UserSchema.methods.destroyToken = async (token) => {
-  let user = this;
-
-  try {
-    await user.update({ $pull: { tokens: token } });
-  } catch (err) {
-    return err;
-  }
-};
-
-UserSchema.methods.comparePassword = (plainPassword) => {
+UserSchema.methods.comparePassword = function (plainPassword, callback) {
   let user = this;
 
   comparePassword(plainPassword, user.password, (err, isMatch) => {
-    if (err) return err;
+    if (err) return callback(err);
 
-    return isMatch;
+    callback(null, isMatch);
   });
 };
 
 UserSchema.pre('save', function (next) {
   let user = this;
+
+  if (!user.isModified('password')) return next();
 
   hashPassword(user.password, (err, hash) => {
     if (err) return next(err);

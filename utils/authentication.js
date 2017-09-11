@@ -12,6 +12,8 @@ exports.validate = async (request, decodedToken, callback) => {
   try {
     let user = await User.findByCredentials(decodedToken);
 
+    request.user = user;
+
     callback(null, true, user);
   } catch (err) {
     return callback(err, false, user);

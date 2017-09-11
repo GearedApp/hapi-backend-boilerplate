@@ -10,10 +10,9 @@ const Jwt = require('jsonwebtoken');
  */
 exports.generateAuthToken = async (payload) => {
   try {
-    const access = 'auth';
     const token = await Jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '1d' });
 
-    return { access, token };
+    return token;
   } catch (err) {
     return err;
   }
@@ -27,7 +26,6 @@ exports.generateAuthToken = async (payload) => {
  */
 exports.generatePasswordToken = async (payload) => {
   try {
-    const access = 'password';
     const token = await Jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '1h' });
 
     return { access, token };
