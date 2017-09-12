@@ -16,6 +16,7 @@ server.register([
   require('hapi-auth-jwt'),
   require('./routes/auth'),
   require('./routes/users'),
+  require('./routes/documents'),
 ], (err) => {
   if (err) throw err;
 

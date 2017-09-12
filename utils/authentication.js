@@ -10,7 +10,7 @@ const User = require('../models/User');
  */
 exports.validate = async (request, decodedToken, callback) => {
   try {
-    let user = await User.findByCredentials(decodedToken);
+    let user = await User.findById(decodedToken.id);
 
     request.user = user;
 

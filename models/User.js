@@ -44,16 +44,6 @@ let UserSchema = new Mongoose.Schema({
   },
 });
 
-UserSchema.statics.findByCredentials = async (decodedToken) => {
-  try {
-    let user = await this.findById(decodedToken.id);
-
-    return user;
-  } catch (err) {
-    return err;
-  }
-};
-
 UserSchema.methods.generateAuthToken = async () => {
   let user = this;
 
