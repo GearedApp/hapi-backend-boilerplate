@@ -1,4 +1,4 @@
-'use require';
+'use strict';
 
 const Joi = require('Joi');
 const Authentication = require('../controllers/authentication');
@@ -49,13 +49,10 @@ exports.register = (server, options, next) => {
     },
     {
       method: 'POST',
-      path: '/api/v1/auth/reset/:token',
+      path: '/api/v1/auth/reset/{token}',
       config: {
         auth: false,
         validate: {
-          query: {
-            token: Joi.string().required(),
-          },
           payload: {
             password: Joi.string().required(),
           }
@@ -74,5 +71,5 @@ exports.register = (server, options, next) => {
 };
 
 exports.register.attributes = {
-  name: 'routes-users'
+  name: 'routes-auth'
 };
